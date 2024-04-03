@@ -1,0 +1,24 @@
+version: 0.2
+env:
+  parameter-store:
+    LW_ACCOUNT: "LW_ACCOUNT"
+    LW_API_KEY: "LW_API_KEY"
+    LW_API_SECRET: "LW_API_SECRET"
+    LW_ACCESS_TOKEN: "INLINE_SCANNER_TOKEN"
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+    commands:
+      - curl https://raw.githubusercontent.com/lacework/go-sdk/master/cli/install.sh | bash
+      - lacework component install iac
+  build:
+    commands:
+      - export LW_ACCOUNT=$LW_ACCOUNT
+      - export LW_ACCOUNT_NAME=$LW_ACCOUNT
+      - export LW_API_KEY=$LW_API_KEY
+      - export LW_API_SECRET=$LW_API_SECRET
+      - export LW_ACCESS_TOKEN=$LW_ACCESS_TOKEN
+      - git clone https://github.com/gm-test-1/ecommerce-deploy
+        # Update the Lacework command below to fail on Iac Terraform files with critical vulnerabilities
+      - lacework iac terraform-scan --fail critical=1
