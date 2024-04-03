@@ -1,0 +1,31 @@
+version: 0.2
+env:
+  parameter-store:
+    LW_ACCOUNT: "LW_ACCOUNT"
+    LW_API_KEY: "LW_API_KEY"
+    LW_API_SECRET: "LW_API_SECRET"
+    LW_ACCESS_TOKEN: "INLINE_SCANNER_TOKEN"
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+    commands:
+      - curl -L https://github.com/lacework/lacework-vulnerability-scanner/releases/latest/download/lw-scanner-linux-amd64 -o lw-scanner
+      - chmod +x lw-scanner
+  build:
+    commands:
+      - docker pull public.ecr.aws/d8d9f1a0/ecommerce-website:latest
+      - docker tag  public.ecr.aws/d8d9f1a0/ecommerce-website:latest "$DOCKER_REG/$IMAGE_NAME:latest"
+  post_build:
+    commands:
+      - export LW_ACCOUNT=$LW_ACCOUNT
+      - export LW_ACCOUNT_NAME=$LW_ACCOUNT
+      - export LW_API_KEY=$LW_API_KEY
+      - export LW_API_SECRET=$LW_API_SECRET
+      - export LW_ACCESS_TOKEN=$LW_ACCESS_TOKEN
+      - export LW_SCANNER_DISABLE_UPDATES=true
+      - export LW_SCANNER_SAVE_RESULTS=true
+      # Update the Lacework command below to fail if the container image contains critical vulnerabilities
+      - ./lw-scanner image evaluate "$DOCKER_REG/$IMAGE_NAME" latest --critical-violation-exit-code 1 --policy
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $DOCKER_REG
+      - docker image push -a "$DOCKER_REG/$IMAGE_NAME"
