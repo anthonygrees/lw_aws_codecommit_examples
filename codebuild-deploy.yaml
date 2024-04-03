@@ -1,0 +1,7 @@
+version: 0.2
+phases:
+  post_build:
+    commands:
+      # Here is where you deployment process woud live in a production pipeline.
+      # The acutal deployment steps are ommited for this Quest.
+      - echo "Deployed Application to Production!"
