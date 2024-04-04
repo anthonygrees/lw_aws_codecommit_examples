@@ -1,2 +1,4 @@
-# lw_aws_codecommit_examples
-AWS CodeCommit Examples for IaC and Container Vulns 
+# Lacework AWS CodeCommit Examples
+AWS CodeCommit Examples for IaC and Container Vulns  
+
+  
